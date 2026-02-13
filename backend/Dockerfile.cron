@@ -12,6 +12,4 @@ COPY . .
 COPY cron/publish_posts /etc/cron.d/publish_posts
 RUN chmod 0644 /etc/cron.d/publish_posts && crontab /etc/cron.d/publish_posts
 
-RUN printenv > /etc/environment
-
-CMD ["cron", "-f"]
+CMD bash -c "printenv > /etc/environment && cron -f"
