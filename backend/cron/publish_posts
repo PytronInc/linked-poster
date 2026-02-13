@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+PYTHONPATH=/app
+
+# Publish due posts every 5 minutes
+*/5 * * * * root . /etc/environment; cd /app && /usr/local/bin/python -m cron.publisher >> /proc/1/fd/1 2>&1

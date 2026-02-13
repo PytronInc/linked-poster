@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: linkedin_mongodb
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    volumes:
+      - linkedin_mongo_data:/data/db
+
+  backend:
+    build: ./backend
+    container_name: linkedin_backend
+    restart: unless-stopped
+    ports:
+      - "8010:8010"
+    env_file:
+      - .env
+    environment:
+      MONGO_CONNECTION_STRING: mongodb://admin:password123@mongodb:27017/linkedin_autoposter?authSource=admin
+    depends_on:
+      - mongodb
+
+  cron:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.cron
+    container_name: linkedin_cron
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MONGO_CONNECTION_STRING: mongodb://admin:password123@mongodb:27017/linkedin_autoposter?authSource=admin
+    depends_on:
+      - mongodb
+
+  frontend:
+    build: ./frontend
+    container_name: linkedin_frontend
+    restart: unless-stopped
+    ports:
+      - "3010:80"
+    depends_on:
+      - backend
+
+volumes:
+  linkedin_mongo_data:
